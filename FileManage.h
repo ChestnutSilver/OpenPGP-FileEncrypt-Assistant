@@ -17,9 +17,11 @@ using namespace std;
 
 class FileManage
 {
+private:
+	char* Output;
 public:
 	~FileManage();
-	string SignAndEncryptString(string plainText, string pwd, string userID, string keyringDir);
+	void SignAndEncryptString(string pwd, string userID, string keyringDir);
 	void DecryptAndVerifyString(string signedAndEncryptedMessage, string pwd, string userID);
 
 };

@@ -40,7 +40,6 @@ int ModeManage::modeInput(Global global, User user)
 		if (mode == "1")
 		{
 			WriteLine("原理展示");
-			WriteLine("请任意输入想要加密的内容，以另起一行输入\":wq\"结束");
 			return 1;
 		}
 		else if (mode == "2")
@@ -89,38 +88,12 @@ void ModeManage::modeControl(int mode, User user, string pwd)
 {
 	if (mode == 1)
 	{
-		string text = "";
-		string input;
-		getline(cin, input);
-		string next;
-		getline(cin, next);
-		while (true)
-		{
-			if (next == ":wq")
-			{
-				text = text + input;
-				break;
-			}
-			else
-			{
-				text = text + input + "\r\n";
-			}
-			input = next;
-			getline(cin, next);
-		}
-
-
 		//签名加密字符串
 		FileManage fileManage;
-		string after_string = fileManage.SignAndEncryptString(text, pwd, user.getUserID(), modeGlobal.pathStringKey);
-		WriteLine("The string inputed by the keyboard is: ");
-		WriteLine(text);
-		WriteLine("Verify by your private key, and then encrypt by your public key, the result string is: ");
-		WriteLine(after_string);
+		fileManage.SignAndEncryptString(pwd, user.getUserID(), modeGlobal.pathStringKey);
 
 		//解密并验证签名
-		fileManage.DecryptAndVerifyString(after_string, pwd, user.getUserID());
-
+		//fileManage.DecryptAndVerifyString("a", pwd, user.getUserID());
 
 		WriteLine("--------------");
 			
