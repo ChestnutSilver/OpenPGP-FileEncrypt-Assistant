@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
+#include <ipworksopenpgp.h>
 #pragma comment(lib,"ipworksopenpgp22.lib")
 
 #include <vector>
@@ -225,4 +225,97 @@ done:
     fprintf(stderr, "\npress <return> to continue...\n");
     getchar();
     exit(ret_code);
+}
+
+string FileManage::SignAndEncryptSingle(string pwd, string filePath, string userID, string pathStringFile, string keyringDir)
+{
+    string fileName = filePath.substr(filePath.find_last_of("\\"));//取文件名不确定是否可行
+    string newFile = fileName + ".gpg";//生成文件名为源文件名加gpg后缀
+
+    string outputFile = conbineStrings(pathStringFile, newFile);
+
+    OpenPGP pgp;
+    pgp.SetInputFile(fileName.c_str());
+    pgp.SetOutputFile(outputFile.c_str());
+
+    pgp.SetASCIIArmor(true);
+    pgp.SetOverwrite(true);//覆盖写
+    pgp.SetKeyPassphrase(0, pwd.c_str());
+
+    pgp.SetKeyCount(1);
+    pgp.SetKeyKeyring(0, keyringDir.c_str());
+    pgp.SetKeyUserId(0, userID.c_str());
+
+    pgp.SetRecipientKeyCount(1);
+    pgp.SetRecipientKeyKeyring(0, keyringDir.c_str());
+    pgp.SetRecipientKeyUserId(0, userID.c_str());
+
+    int ret_code = pgp.SignAndEncrypt();
+
+    return outputFile;
+}
+
+string FileManage::SignAndEncryptMultiple(string pwd, string filePath, vector<string> allUsers, string userID, string pathStringFile, string keyringDir)
+{
+    string fileName = filePath.substr(filePath.find_last_of("\\"));//取文件名不确定是否可行
+    string newFile = fileName + ".gpg";//生成文件名为源文件名加gpg后缀
+
+    string outputFile = conbineStrings(pathStringFile, newFile);
+
+    OpenPGP pgp;
+    pgp.SetInputFile(fileName.c_str());
+    pgp.SetOutputFile(outputFile.c_str());
+
+    pgp.SetASCIIArmor(true);
+    pgp.SetOverwrite(true);//覆盖写
+    pgp.SetKeyPassphrase(0, pwd.c_str());
+
+    pgp.SetKeyCount(1);
+    pgp.SetKeyKeyring(0, keyringDir.c_str());
+    pgp.SetKeyUserId(0, userID.c_str());
+
+    int count = allUsers.size();//假设存的id
+    pgp.SetRecipientKeyCount(count);
+    pgp.SetRecipientKeyKeyring(0, keyringDir.c_str());
+    for (int i = 0; i < count; i++)
+        pgp.SetRecipientKeyUserId(0, allUsers[i].c_str());
+
+
+    int ret_code = pgp.SignAndEncrypt();
+
+    return outputFile;
+}
+
+bool FileManage::VerifySingle(string pwd, string filePath, string userID, string pathStringFile, string keyringDir)
+{
+    string tempFile = conbineStrings(pathStringFile, "temp.txt");
+
+    OpenPGP pgp;
+    pgp.SetOverwrite(1);
+    pgp.SetInputFile(filePath.c_str());
+    pgp.SetOutputFile(tempFile.c_str());
+
+    pgp.SetKeyCount(1);
+    pgp.SetKeyKeyring(0, keyringDir.c_str());
+    pgp.SetKeyUserId(0, userID.c_str());
+    pgp.SetKeyPassphrase(0, pwd.c_str());
+    pgp.SetSignerKeyCount(1);
+    pgp.SetSignerKeyKeyring(0, keyringDir.c_str());
+    pgp.SetSignerKeyUserId(0, userID.c_str());
+    int ret_code = pgp.DecryptAndVerifySignature();
+    //deletetempfile
+    if(ret_code)
+    {
+        return false;
+    }
+    else
+    {
+        WriteLine("身份验证成功");
+        return true;
+    }
+}
+
+bool FileManage::Verify(string pwd, string filePath, vector<string> allUsers, string userID, string pathStringFile, string keyringDir)
+{
+    return true;
 }

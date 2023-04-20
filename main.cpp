@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
+#include <ipworksopenpgp.h>
 #pragma comment(lib,"ipworksopenpgp22.lib")
 
 #include <vector>

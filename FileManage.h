@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
+#include <ipworksopenpgp.h>
 #pragma comment(lib,"ipworksopenpgp22.lib")
 
 #include <vector>
@@ -23,5 +23,8 @@ public:
 	~FileManage();
 	void SignAndEncryptString(string pwd, string userID, string keyringDir);
 	void DecryptAndVerifyString(string signedAndEncryptedMessage, string pwd, string userID);
-
+	string SignAndEncryptSingle(string pwd, string filePath, string userID, string pathStringFile, string keyringDir);
+	string SignAndEncryptMultiple(string pwd, string filePath, vector<string> allUsers, string userID, string pathStringFile, string keyringDir);
+	bool VerifySingle(string pwd, string filePath, string userID, string pathStringFile, string keyringDir);
+	bool Verify(string pwd, string filePath, vector<string> allUsers, string userID, string pathStringFile, string keyringDir);
 };
