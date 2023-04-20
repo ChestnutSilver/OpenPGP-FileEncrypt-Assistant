@@ -61,12 +61,14 @@ int main()
 
     //密钥生成和导出
     KeyManage keyManage;
+    keyManage.init(global, user);
+
     //密码唯一，且由用户的用户名和安全序列号唯一生成
     string pwd = ToString(hash<string>{}(user.getUsername()) ^ hash<PVOID>{}(user.getStringSid()));
 
     keyManage.GenerateKeyPairRSA(userID, pwd);
     keyManage.ExportPublicKey(userID, pwd);
-    //keyManage.ExportPrivateKey(userID, passwd);//私钥敏感信息不能导出
+    keyManage.ExportPrivateKey(userID, pwd);//私钥敏感信息不能导出
     keyManage.KeyStoreListKeys(pwd);
 
     //模式选择：原理展示/存储模式/调阅模式

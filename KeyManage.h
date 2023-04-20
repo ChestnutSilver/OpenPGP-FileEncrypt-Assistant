@@ -13,11 +13,29 @@
 using namespace std;
 
 #include "main.h"
+#include "global.h"
+#include "user.h"
+
+class MyKeyMgr : public KeyMgr
+{
+public:
+	virtual int FireKeyList(KeyMgrKeyListEventParams* e)
+	{
+		printf("%-58s %-8s %-12s\n", e->UserId, e->KeyId, e->HasSecretKey ? "private" : "");
+		return 0;
+	}
+};
 
 class KeyManage
 {
+private:
+	Global keyGlobal;
+	User keyUser;
+	MyKeyMgr keymgr;
+
 public:
 	~KeyManage();
+	void init(Global global, User user);
 	void GenerateKeyPairRSA(string userID, string pwd);
 	void ExportPublicKey(string userID, string pwd);
 	void ExportPrivateKey(string userID, string pwd);
