@@ -4,13 +4,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <ipworksopenpgp.h>
+#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
 #pragma comment(lib,"ipworksopenpgp22.lib")
 
 #include <vector>
 #include <Windows.h>
 #include <iostream>
-#include <io.h>//*********
 using namespace std;
 
 #include "main.h"
@@ -109,9 +108,9 @@ void ModeManage::modeControl(int mode, User user, string pwd)
 			if (!_access(filePath.c_str(), 0))
 			{
 				FileManage fileManage;
-				
 				string outputFile = fileManage.SignAndEncryptSingle(pwd, filePath, user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
-				bool check = fileManage.VerifySingle(pwd, outputFile, user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
+				bool check = fileManage.VerifySingle(fileManage.modeUserIDPwd.modePwd, outputFile, fileManage.modeUserIDPwd.modeUserID, modeGlobal.pathStringFile, modeGlobal.pathStringKey);
+				//bool check = fileManage.VerifySingle(pwd, outputFile, user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
 				if (check)
 				{
 					string temp = "文件存储成功，并由用户" + user.getUsername() + "签名，在" + outputFile + "中";//username???
@@ -120,6 +119,7 @@ void ModeManage::modeControl(int mode, User user, string pwd)
 				else
 				{
 					//cleardeletfile outputfile
+					WriteLine("21-test-exp2");
 				}
 				WriteLine("--------------");
 				break;
