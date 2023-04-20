@@ -23,8 +23,13 @@ KeyManage::~KeyManage()
 
 void KeyManage::init(Global global, User user)
 {
-	keyGlobal = global;
-	keyUser = user;
+	keyGlobal.pathString = global.pathString; 
+	keyGlobal.pathStringFile = global.pathStringFile;
+	keyGlobal.pathStringKey = global.pathStringKey;
+	keyGlobal.pathStringUser = global.pathStringUser;
+
+	keyUser.userID = user.getUserID();
+
 }
 
 
@@ -55,6 +60,8 @@ void KeyManage::GenerateKeyPairRSA(string userID, string pwd)
 	int save_code = keymgr.SaveKeyring(keyringDir.c_str());
 	if (save_code == 0)
 		cout << "Key has been saved at: " << keyringDir << endl;
+
+
 
 
 }
@@ -95,5 +102,21 @@ void KeyManage::KeyStoreListKeys(string pwd)
 
 	keymgr.LoadKeyring(keyringDir.c_str());
 	keymgr.ListKeys();
+
+	/*
+	// 调试时，如需删除key，打开此注释
+	while (1)
+	{
+		char userid[100];
+		printf("User Id: ");
+		fgets(userid, 100, stdin);
+		userid[strlen(userid) - 1] = '\0';
+		cout << keymgr.DeleteKey(userid) << endl;
+
+		keymgr.SaveKeyring(keyringDir.c_str());
+
+		keymgr.ListKeys();
+	}
+	*/
 
 }

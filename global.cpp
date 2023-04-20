@@ -25,6 +25,44 @@ string conbineStrings(string left, string right)
 	return ss.str();
 }
 
+string globalGetUserName()
+{
+	string username;
+	HANDLE hToken;
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
+	{
+		DWORD dwLengthNeeded;
+		if (!GetTokenInformation(hToken, TokenUser, NULL, 0, &dwLengthNeeded) && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+		{
+			PTOKEN_USER pTokenUser = (PTOKEN_USER)GlobalAlloc(GPTR, dwLengthNeeded);
+			if (pTokenUser != NULL)
+			{
+				if (GetTokenInformation(hToken, TokenUser, pTokenUser, dwLengthNeeded, &dwLengthNeeded))
+				{
+					SID_NAME_USE sidNameUse;
+
+					wchar_t szUserName[256];
+					DWORD dwUserNameSize = sizeof(szUserName);
+					wchar_t szDomainName[256];
+
+					DWORD dwDomainNameSize = sizeof(szDomainName);
+					PSID pSid = pTokenUser->User.Sid;
+					if (LookupAccountSid(NULL, pSid, szUserName, &dwUserNameSize, szDomainName, &dwDomainNameSize, &sidNameUse))
+					{
+						//wprintf(L"Current user: %s\\%s\n", szDomainName, szUserName);
+						//printf("Current user: %s\\%s\n", szDomainName, szUserName);
+
+						username = WcharToString(szUserName);
+					}
+				}
+				GlobalFree(pTokenUser);
+			}
+		}
+		CloseHandle(hToken);
+	}
+	return username;
+}
+
 int createDirectoryByString(string path)
 {
 /*
@@ -132,7 +170,7 @@ void Global::set_baseName()
 	}
 
 	pathString = conbineStrings(baseName, folderName);
-	pathStringUser = conbineStrings(pathString, EnvironmentUser.getUsername());
+	pathStringUser = conbineStrings(pathString, globalGetUserName());
 	pathStringKey = conbineStrings(pathStringUser, folderName1);
 	pathStringFile = conbineStrings(pathStringUser, folderName2);
 

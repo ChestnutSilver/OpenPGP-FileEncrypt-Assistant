@@ -13,8 +13,8 @@
 using namespace std;
 
 #include "main.h"
-#include "global.h"
 #include "user.h"
+#include "global.h"
 
 class MyKeyMgr : public KeyMgr
 {
@@ -29,8 +29,16 @@ public:
 class KeyManage
 {
 private:
-	Global keyGlobal;
-	User keyUser;
+	struct KeyGlobal {
+		string pathString;
+		string pathStringUser;
+		string pathStringKey;
+		string pathStringFile;
+	}keyGlobal;
+	struct KeyUser {
+		string userID;
+	}keyUser;
+	
 	MyKeyMgr keymgr;
 
 public:

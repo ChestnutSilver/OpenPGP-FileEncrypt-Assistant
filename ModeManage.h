@@ -14,11 +14,21 @@ using namespace std;
 
 #include "main.h"
 #include "user.h"
+#include "FileManage.h"
+#include "global.h"
 
 class ModeManage
 {
+private:
+	struct ModeGlobal {
+		string pathString;
+		string pathStringUser;
+		string pathStringKey;
+		string pathStringFile;
+	}modeGlobal;
+
 public:
 	~ModeManage();
-	int modeInput(User user);
+	int modeInput(Global global, User user);
 	void modeControl(int mode, User user, string pwd);
 };

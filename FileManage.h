@@ -13,11 +13,13 @@
 using namespace std;
 
 #include "main.h"
+#include "KeyManage.h"
 
 class FileManage
 {
 public:
 	~FileManage();
-	string SignAndEncryptString(string plainText, string pwd, string userID, Global global);
+	string SignAndEncryptString(string plainText, string pwd, string userID, string keyringDir);
+	void DecryptAndVerifyString(string signedAndEncryptedMessage, string pwd, string userID);
 
 };

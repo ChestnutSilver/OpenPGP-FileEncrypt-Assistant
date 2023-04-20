@@ -1,8 +1,8 @@
 /**
  * Filename: ISP-03
  * Author: 2053182 王润霖，2052338 鲍宇轩
- * Date: 2023.04.19
- * Version: 1.3
+ * Date: 2023.04.20
+ * Version: 1.4
  * Description: Proj 03--OpenPGP File Encryption
  * References:
  */
@@ -60,7 +60,8 @@ int main()
     string userID = user.getUserID();
 
     //密钥生成和导出
-    KeyManage keyManage;
+
+    KeyManage keyManage; 
     keyManage.init(global, user);
 
     //密码唯一，且由用户的用户名和安全序列号唯一生成
@@ -76,7 +77,7 @@ int main()
     while (true)
     {
         ModeManage modeManage;
-        int Mode = modeManage.modeInput(user);
+        int Mode = modeManage.modeInput(global, user);
         modeManage.modeControl(Mode, user, pwd);
         WriteLine("程序已结束，按q退出，按其他任意键返回用户界面...");
         string quit;

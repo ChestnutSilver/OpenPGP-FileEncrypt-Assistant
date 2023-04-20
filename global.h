@@ -19,11 +19,12 @@ using namespace std;
 
 string conbineStrings(string left, string right);
 int createDirectoryByString(string path);
+string globalGetUserName();
 
 class Global
 {
 private:
-	User EnvironmentUser;
+
 public:
 	string baseName = "D:\\";
 	string folderName = "OpenPGP_File_Manage_show";

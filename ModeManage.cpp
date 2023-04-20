@@ -15,6 +15,8 @@ using namespace std;
 #include "main.h"
 #include "user.h"
 #include "ModeManage.h"
+#include "FileManage.h"
+#include "global.h"
 
 #include <sstream>
 
@@ -23,8 +25,13 @@ ModeManage::~ModeManage()
 
 }
 
-int ModeManage::modeInput(User user)
+int ModeManage::modeInput(Global global, User user)
 {
+	modeGlobal.pathString = global.pathString;
+	modeGlobal.pathStringFile = global.pathStringFile;
+	modeGlobal.pathStringKey = global.pathStringKey;
+	modeGlobal.pathStringUser = global.pathStringUser;
+
 	while (true)
 	{
 		WriteLine("模式选择：1->原理展示，2->存储文件，3->调阅文件");
@@ -104,10 +111,15 @@ void ModeManage::modeControl(int mode, User user, string pwd)
 
 
 		//签名加密字符串
-
-
+		FileManage fileManage;
+		string after_string = fileManage.SignAndEncryptString(text, pwd, user.getUserID(), modeGlobal.pathStringKey);
+		WriteLine("The string inputed by the keyboard is: ");
+		WriteLine(text);
+		WriteLine("Verify by your private key, and then encrypt by your public key, the result string is: ");
+		WriteLine(after_string);
 
 		//解密并验证签名
+		fileManage.DecryptAndVerifyString(after_string, pwd, user.getUserID());
 
 
 		WriteLine("--------------");
