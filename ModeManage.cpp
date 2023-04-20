@@ -36,7 +36,7 @@ int ModeManage::modeInput(Global global, User user)
 	{
 		WriteLine("模式选择：1->原理展示，2->存储文件，3->调阅文件");
 		string mode;
-		cin >> mode;
+		getline(cin, mode);
 		if (mode == "1")
 		{
 			WriteLine("原理展示");
@@ -100,7 +100,6 @@ void ModeManage::modeControl(int mode, User user, string pwd)
 	}
 	else if (mode == 21)
 	{
-		//******************************************************************
 		string filePath;
 		getline(cin, filePath);
 		while (true)
@@ -113,8 +112,11 @@ void ModeManage::modeControl(int mode, User user, string pwd)
 				//bool check = fileManage.VerifySingle(pwd, outputFile, user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
 				if (check)
 				{
-					string temp = "文件存储成功，并由用户" + user.getUsername() + "签名，在" + outputFile + "中";//username???
-					WriteLine(temp);
+					WriteLine(("文件存储成功，并由用户 " + user.getUsername() + " 签名。"));
+					WriteLine(("签名的加密文件，存储在: "));
+					WriteLine(outputFile);
+
+					WriteLine("Success 2-1: 单用户模式下，用户能够对文件加密并存储，并通过签名真实性认证，并且能够解密文件！");
 				}
 				else
 				{
@@ -130,11 +132,9 @@ void ModeManage::modeControl(int mode, User user, string pwd)
 				getline(cin, filePath);
 			}
 		}
-		/******************************************************************
 	}
 	else if (mode == 22)
 	{
-		/******************************************************************
 		string filePath;
 		getline(cin, filePath);
 		while (true)
@@ -142,16 +142,20 @@ void ModeManage::modeControl(int mode, User user, string pwd)
 			if (!_access(filePath.c_str(), 0))
 			{
 				FileManage fileManage;
-				string outputFile = fileManage.SignAndEncryptMultiple(pwd, filePath, user.getAllUsers(),user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
-				bool check = fileManage.Verify(pwd, outputFile, user.getAllUsers(), user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
+				string outputFile = fileManage.SignAndEncryptMultiple(pwd, filePath, user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
+				bool check = fileManage.Verify(fileManage.modeUserIDPwd.modePwd, outputFile, fileManage.modeUserIDPwd.modeUserID, modeGlobal.pathStringFile, modeGlobal.pathStringKey);
 				if (check)
 				{
-					string temp = "文件存储成功，并由用户" + user.getUsername() + "签名，在" + outputFile + "中";//username???
-					WriteLine(temp);
+					WriteLine(("文件存储成功，并由用户 " + user.getUsername() + " 签名。"));
+					WriteLine(("签名的加密文件，存储在: "));
+					WriteLine(outputFile);
+
+					WriteLine("Success 2-2: 多用户模式下，A用户能够对文件加密、签名并存储，并且B用户能够进行真实性认证，并解密文件！");
 				}
 				else
 				{
 					//cleardeletfile outputfile
+					WriteLine("21-test-exp2");
 				}
 				WriteLine("--------------");
 				break;
@@ -162,11 +166,18 @@ void ModeManage::modeControl(int mode, User user, string pwd)
 				getline(cin, filePath);
 			}
 		}
-		//******************************************************************/
 	}
 	else if (mode == 3)
 	{
+		FileManage fileManage;
+		string outputFile;
+		getline(cin, outputFile);
+		bool check = fileManage.Verify(fileManage.modeUserIDPwd.modePwd, outputFile, fileManage.modeUserIDPwd.modeUserID, modeGlobal.pathStringFile, modeGlobal.pathStringKey);
 
+		if (check)
+		{
+			WriteLine("Success 3: 单用户与多用户模式下，A、B用户能够解密自己拥有调阅权限的文件！");
+		}
 	}
 	else
 	{

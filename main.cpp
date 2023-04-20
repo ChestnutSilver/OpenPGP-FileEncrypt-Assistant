@@ -1,8 +1,8 @@
 /**
  * Filename: ISP-03
  * Author: 2053182 Õı»Û¡ÿ£¨2052338 ±´”Ó–˘
- * Date: 2023.04.20
- * Version: 1.4
+ * Date: 2023.04.21
+ * Version: 2.0
  * Description: Proj 03--OpenPGP File Encryption
  * References:
  */
@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <ipworksopenpgp.h>
+#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
 #pragma comment(lib,"ipworksopenpgp22.lib")
 
 #include <vector>
