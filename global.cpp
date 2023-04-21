@@ -4,8 +4,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
-#pragma comment(lib,"ipworksopenpgp22.lib")
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgp.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgpkey.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qopenpgp.h"
+
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib\\ipworksopenpgp22.lib")
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib64\\ipworksopenpgp22.lib")
 
 #include <vector>
 #include <Windows.h>
@@ -20,159 +24,160 @@ using namespace std;
 
 string conbineStrings(string left, string right)
 {
-	std::stringstream ss;
-	ss << left << "\\" << right;
-	return ss.str();
+    std::stringstream ss;
+    ss << left << "\\" << right;
+    return ss.str();
 }
 
 string globalGetUserName()
 {
-	string username;
-	HANDLE hToken;
-	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
-	{
-		DWORD dwLengthNeeded;
-		if (!GetTokenInformation(hToken, TokenUser, NULL, 0, &dwLengthNeeded) && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-		{
-			PTOKEN_USER pTokenUser = (PTOKEN_USER)GlobalAlloc(GPTR, dwLengthNeeded);
-			if (pTokenUser != NULL)
-			{
-				if (GetTokenInformation(hToken, TokenUser, pTokenUser, dwLengthNeeded, &dwLengthNeeded))
-				{
-					SID_NAME_USE sidNameUse;
+    string username;
+    HANDLE hToken;
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
+    {
+        DWORD dwLengthNeeded;
+        if (!GetTokenInformation(hToken, TokenUser, NULL, 0, &dwLengthNeeded) && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+        {
+            PTOKEN_USER pTokenUser = (PTOKEN_USER)GlobalAlloc(GPTR, dwLengthNeeded);
+            if (pTokenUser != NULL)
+            {
+                if (GetTokenInformation(hToken, TokenUser, pTokenUser, dwLengthNeeded, &dwLengthNeeded))
+                {
+                    SID_NAME_USE sidNameUse;
 
-					wchar_t szUserName[256];
-					DWORD dwUserNameSize = sizeof(szUserName);
-					wchar_t szDomainName[256];
+                    wchar_t szUserName[256];
+                    DWORD dwUserNameSize = sizeof(szUserName);
+                    wchar_t szDomainName[256];
 
-					DWORD dwDomainNameSize = sizeof(szDomainName);
-					PSID pSid = pTokenUser->User.Sid;
-					if (LookupAccountSid(NULL, pSid, szUserName, &dwUserNameSize, szDomainName, &dwDomainNameSize, &sidNameUse))
-					{
-						//wprintf(L"Current user: %s\\%s\n", szDomainName, szUserName);
-						//printf("Current user: %s\\%s\n", szDomainName, szUserName);
+                    DWORD dwDomainNameSize = sizeof(szDomainName);
+                    PSID pSid = pTokenUser->User.Sid;
+                    if (LookupAccountSid(NULL, pSid, szUserName, &dwUserNameSize, szDomainName, &dwDomainNameSize, &sidNameUse))
+                    {
+                        //wprintf(L"Current user: %s\\%s\n", szDomainName, szUserName);
+                        //printf("Current user: %s\\%s\n", szDomainName, szUserName);
 
-						username = WcharToString(szUserName);
-					}
-				}
-				GlobalFree(pTokenUser);
-			}
-		}
-		CloseHandle(hToken);
-	}
-	return username;
+                        username = WcharToString(szUserName);
+                    }
+                }
+                GlobalFree(pTokenUser);
+            }
+        }
+        CloseHandle(hToken);
+    }
+    return username;
 }
 
 int createDirectoryByString(string path)
 {
 /*
-* ÔÚ´úÂëÖĞ£¬ÎÒÃÇÊ¹ÓÃÁËMultiByteToWideCharº¯ÊıÀ´½«Â·¾¶²ÎÊı´Óstd::stringÀàĞÍ×ª»»ÎªLPCWSTRÀàĞÍ¡£
-* ¸Ãº¯Êı½ÓÊÜÎå¸ö²ÎÊı£ºÔ´´úÂëÒ³£¨ÕâÀïÊÇCP_ACP£¬±íÊ¾Ê¹ÓÃµ±Ç°ÏµÍ³µÄANSI´úÂëÒ³£©¡¢±êÖ¾£¨ÕâÀïÊÇ0£©¡¢
-* 					Ô´×Ö·û´®µÄÖ¸Õë¡¢Ô´×Ö·û´®µÄ³¤¶È£¨ÕâÀïÊ¹ÓÃ-1±íÊ¾×Ô¶¯¼ÆËã£©¡¢Ä¿±ê»º³åÇøµÄÖ¸ÕëºÍÄ¿±ê»º³åÇøµÄ´óĞ¡¡£
-* ÎÒÃÇÊ¹ÓÃvectorÀ´´´½¨Ò»¸ö×ã¹»´óµÄ»º³åÇø£¬²¢½«Æä´«µİ¸øMultiByteToWideCharº¯Êı¡£
-* ×îºó£¬ÎÒÃÇÊ¹ÓÃbuffer.data()½«»º³åÇøÖ¸Õë×ª»»ÎªLPCWSTRÀàĞÍ£¬²¢½«Æä´«µİ¸øCreateDirectoryº¯Êı¡£
+* åœ¨ä»£ç ä¸­ï¼Œæˆ‘ä»¬ä½¿ç”¨äº†MultiByteToWideCharå‡½æ•°æ¥å°†è·¯å¾„å‚æ•°ä»std::stringç±»å‹è½¬æ¢ä¸ºLPCWSTRç±»å‹ã€‚
+* è¯¥å‡½æ•°æ¥å—äº”ä¸ªå‚æ•°ï¼šæºä»£ç é¡µï¼ˆè¿™é‡Œæ˜¯CP_ACPï¼Œè¡¨ç¤ºä½¿ç”¨å½“å‰ç³»ç»Ÿçš„ANSIä»£ç é¡µï¼‰ã€æ ‡å¿—ï¼ˆè¿™é‡Œæ˜¯0ï¼‰ã€
+* 					æºå­—ç¬¦ä¸²çš„æŒ‡é’ˆã€æºå­—ç¬¦ä¸²çš„é•¿åº¦ï¼ˆè¿™é‡Œä½¿ç”¨-1è¡¨ç¤ºè‡ªåŠ¨è®¡ç®—ï¼‰ã€ç›®æ ‡ç¼“å†²åŒºçš„æŒ‡é’ˆå’Œç›®æ ‡ç¼“å†²åŒºçš„å¤§å°ã€‚
+* æˆ‘ä»¬ä½¿ç”¨vectoræ¥åˆ›å»ºä¸€ä¸ªè¶³å¤Ÿå¤§çš„ç¼“å†²åŒºï¼Œå¹¶å°†å…¶ä¼ é€’ç»™MultiByteToWideCharå‡½æ•°ã€‚
+* æœ€åï¼Œæˆ‘ä»¬ä½¿ç”¨buffer.data()å°†ç¼“å†²åŒºæŒ‡é’ˆè½¬æ¢ä¸ºLPCWSTRç±»å‹ï¼Œå¹¶å°†å…¶ä¼ é€’ç»™CreateDirectoryå‡½æ•°ã€‚
 
-* ĞèÒª×¢ÒâµÄÊÇ£¬Èç¹ûÄúµÄÂ·¾¶°üº¬·ÇANSI×Ö·û£¬ÔòĞèÒªÊ¹ÓÃ²»Í¬µÄ´úÂëÒ³»ò²»Í¬µÄ×ª»»º¯Êı½øĞĞ×ª»»¡£
-* ÔÚÕâÖÖÇé¿öÏÂ£¬½¨Òé²éÔÄWindows APIÎÄµµ»òÏà¹Ø×ÊÁÏ£¬ÒÔÁË½âÕıÈ·µÄ×ª»»·½Ê½¡£
-* 
-* ÔÚ´úÂëÖĞ£¬ÎÒÃÇÊ¹ÓÃÁËCreateDirectoryº¯ÊıµÄ·µ»ØÖµÀ´ÅĞ¶ÏÄ¿Â¼ÊÇ·ñÒÑ´æÔÚ¡£
-* Èç¹ûCreateDirectoryº¯Êı·µ»Ø0£¬Ôò¼ì²é´íÎóÂëÊÇ·ñÎªERROR_ALREADY_EXISTS»òERROR_PATH_NOT_FOUND¡£
-* Èç¹û´íÎóÂëÎªERROR_ALREADY_EXISTS£¬ÔòËµÃ÷Ä¿Â¼ÒÑ¾­´æÔÚ£¬ÎÒÃÇ¼ÌĞø´´½¨ÏÂÒ»¼¶Ä¿Â¼¡£
-* Èç¹û´íÎóÂëÎªERROR_PATH_NOT_FOUND£¬ÔòËµÃ÷Ä¿Â¼²»´æÔÚ£¬ÎÒÃÇÏÈ´´½¨¸ÃÄ¿Â¼£¬È»ºó¼ÌĞø´´½¨ÏÂÒ»¼¶Ä¿Â¼¡£
-* Èç¹ûCreateDirectoryº¯Êı³É¹¦·µ»Ø£¬Ôò½«Ä¿Â¼Â·¾¶Êä³öµ½¿ØÖÆÌ¨£¬²¢½«Â·¾¶ºóÃæÌí¼ÓÒ»¸öÂ·¾¶·Ö¸ô·ûÒÔ±ãÓÚÏÂÒ»¼¶Ä¿Â¼µÄ´´½¨¡£
+* éœ€è¦æ³¨æ„çš„æ˜¯ï¼Œå¦‚æœæ‚¨çš„è·¯å¾„åŒ…å«éANSIå­—ç¬¦ï¼Œåˆ™éœ€è¦ä½¿ç”¨ä¸åŒçš„ä»£ç é¡µæˆ–ä¸åŒçš„è½¬æ¢å‡½æ•°è¿›è¡Œè½¬æ¢ã€‚
+* åœ¨è¿™ç§æƒ…å†µä¸‹ï¼Œå»ºè®®æŸ¥é˜…Windows APIæ–‡æ¡£æˆ–ç›¸å…³èµ„æ–™ï¼Œä»¥äº†è§£æ­£ç¡®çš„è½¬æ¢æ–¹å¼ã€‚
+*
+* åœ¨ä»£ç ä¸­ï¼Œæˆ‘ä»¬ä½¿ç”¨äº†CreateDirectoryå‡½æ•°çš„è¿”å›å€¼æ¥åˆ¤æ–­ç›®å½•æ˜¯å¦å·²å­˜åœ¨ã€‚
+* å¦‚æœCreateDirectoryå‡½æ•°è¿”å›0ï¼Œåˆ™æ£€æŸ¥é”™è¯¯ç æ˜¯å¦ä¸ºERROR_ALREADY_EXISTSæˆ–ERROR_PATH_NOT_FOUNDã€‚
+* å¦‚æœé”™è¯¯ç ä¸ºERROR_ALREADY_EXISTSï¼Œåˆ™è¯´æ˜ç›®å½•å·²ç»å­˜åœ¨ï¼Œæˆ‘ä»¬ç»§ç»­åˆ›å»ºä¸‹ä¸€çº§ç›®å½•ã€‚
+* å¦‚æœé”™è¯¯ç ä¸ºERROR_PATH_NOT_FOUNDï¼Œåˆ™è¯´æ˜ç›®å½•ä¸å­˜åœ¨ï¼Œæˆ‘ä»¬å…ˆåˆ›å»ºè¯¥ç›®å½•ï¼Œç„¶åç»§ç»­åˆ›å»ºä¸‹ä¸€çº§ç›®å½•ã€‚
+* å¦‚æœCreateDirectoryå‡½æ•°æˆåŠŸè¿”å›ï¼Œåˆ™å°†ç›®å½•è·¯å¾„è¾“å‡ºåˆ°æ§åˆ¶å°ï¼Œå¹¶å°†è·¯å¾„åé¢æ·»åŠ ä¸€ä¸ªè·¯å¾„åˆ†éš”ç¬¦ä»¥ä¾¿äºä¸‹ä¸€çº§ç›®å½•çš„åˆ›å»ºã€‚
 
-* ´úÂëÔİÊ±Ã»ÓĞ´¦ÀíÊäÈëÂ·¾¶Îª¿Õ×Ö·û´®»òÖ»°üº¬Â·¾¶·Ö¸ô·ûµÄÇé¿ö£¬¿ÉÒÔÔÚºóÃæÌí¼ÓÏàÓ¦µÄ´íÎó´¦Àí´úÂë¡£
+* ä»£ç æš‚æ—¶æ²¡æœ‰å¤„ç†è¾“å…¥è·¯å¾„ä¸ºç©ºå­—ç¬¦ä¸²æˆ–åªåŒ…å«è·¯å¾„åˆ†éš”ç¬¦çš„æƒ…å†µï¼Œå¯ä»¥åœ¨åé¢æ·»åŠ ç›¸åº”çš„é”™è¯¯å¤„ç†ä»£ç ã€‚
 */
-	std::string delimiter = "\\";  // ¶¨ÒåÂ·¾¶·Ö¸ô·û
-	size_t pos = 0;
-	std::string token;
-	std::vector<std::string> directories;
+    std::string delimiter = "\\";  // å®šä¹‰è·¯å¾„åˆ†éš”ç¬¦
+    size_t pos = 0;
+    std::string token;
+    std::vector<std::string> directories;
 
-	while ((pos = path.find(delimiter)) != std::string::npos) 
-	{  // Ê¹ÓÃÂ·¾¶·Ö¸ô·û½øĞĞ·Ö¸î
-		token = path.substr(0, pos);
-		directories.push_back(token);
-		path.erase(0, pos + delimiter.length());
-	}
-	directories.push_back(path);  // ½«×îºóÒ»¸öÄ¿Â¼Ìí¼Óµ½ÏòÁ¿ÖĞ
+    while ((pos = path.find(delimiter)) != std::string::npos)
+    {  // ä½¿ç”¨è·¯å¾„åˆ†éš”ç¬¦è¿›è¡Œåˆ†å‰²
+        token = path.substr(0, pos);
+        directories.push_back(token);
+        path.erase(0, pos + delimiter.length());
+    }
+    directories.push_back(path);  // å°†æœ€åä¸€ä¸ªç›®å½•æ·»åŠ åˆ°å‘é‡ä¸­
 
-	std::string current_directory;
-	for (const auto& directory : directories) 
-	{
-		current_directory += directory;
-		std::vector<wchar_t> buffer(current_directory.size() + 1);
-		MultiByteToWideChar(CP_ACP, 0, current_directory.c_str(), -1, buffer.data(), static_cast<int>(buffer.size()));
+    std::string current_directory;
+    for (const auto& directory : directories)
+    {
+        current_directory += directory;
+        std::vector<wchar_t> buffer(current_directory.size() + 1);
+        MultiByteToWideChar(CP_ACP, 0, current_directory.c_str(), -1, buffer.data(), static_cast<int>(buffer.size()));
 
-		if (CreateDirectory(buffer.data(), NULL) == 0) 
-		{
-			DWORD error_code = GetLastError();
-			if (error_code == ERROR_ALREADY_EXISTS) 
-			{  // Ä¿Â¼ÒÑ´æÔÚ£¬¼ÌĞø´´½¨ÏÂÒ»¼¶Ä¿Â¼
-				std::wcout << L"Directory already exists: " << buffer.data() << L"\n";
-			}
-			else if (error_code == ERROR_PATH_NOT_FOUND) 
-			{  // Ä¿Â¼²»´æÔÚ£¬´´½¨Ä¿Â¼²¢¼ÌĞø´´½¨ÏÂÒ»¼¶Ä¿Â¼
-				if (CreateDirectory(buffer.data(), NULL) == 0) 
-				{
-					std::cout << "Failed to create directory!\n";
-					return 1;
-				}
-				std::wcout << L"Directory created successfully: " << buffer.data() << L"\n";
-			}
-			else 
-			{
-				std::cout << "Failed to create directory!\n";
-				return 1;
-			}
-		}
-		else 
-		{
-			std::wcout << L"Directory created successfully: " << buffer.data() << L"\n";
-		}
-		current_directory += "\\";
-	}
+        if (CreateDirectory(buffer.data(), NULL) == 0)
+        {
+            DWORD error_code = GetLastError();
+            if (error_code == ERROR_ALREADY_EXISTS)
+            {  // ç›®å½•å·²å­˜åœ¨ï¼Œç»§ç»­åˆ›å»ºä¸‹ä¸€çº§ç›®å½•
+                std::wcout << L"Directory already exists: " << buffer.data() << L"\n";
+            }
+            else if (error_code == ERROR_PATH_NOT_FOUND)
+            {  // ç›®å½•ä¸å­˜åœ¨ï¼Œåˆ›å»ºç›®å½•å¹¶ç»§ç»­åˆ›å»ºä¸‹ä¸€çº§ç›®å½•
+                if (CreateDirectory(buffer.data(), NULL) == 0)
+                {
+                    std::cout << "Failed to create directory!\n";
+                    return 1;
+                }
+                std::wcout << L"Directory created successfully: " << buffer.data() << L"\n";
+            }
+            else
+            {
+                std::cout << "Failed to create directory!\n";
+                return 1;
+            }
+        }
+        else
+        {
+            std::wcout << L"Directory created successfully: " << buffer.data() << L"\n";
+        }
+        current_directory += "\\";
+    }
 }
 
 
 Global::Global()
 {
-	WriteLine("");
-	WriteLine("OpenPGPÎÄ¼ş¹ÜÀíÏµÍ³");
-	WriteLine("");
+    WriteLine("");
+    WriteLine("OpenPGPæ–‡ä»¶ç®¡ç†ç³»ç»Ÿ");
+    WriteLine("");
 
-	set_baseName();
+    set_baseName();
 
-	WriteLine("Ó¦ÓÃËù´´½¨µÄÎÄ¼ş¼ĞĞÅÏ¢£º");
-	WriteLine(pathString);
-	WriteLine(pathStringUser);
-	WriteLine(pathStringKey);
-	WriteLine(pathStringFile);
+    WriteLine("åº”ç”¨æ‰€åˆ›å»ºçš„æ–‡ä»¶å¤¹ä¿¡æ¯ï¼š");
+    WriteLine(pathString);
+    WriteLine(pathStringUser);
+    WriteLine(pathStringKey);
+    WriteLine(pathStringFile);
 
-	createDirectoryByString(pathString);
-	createDirectoryByString(pathStringUser);
-	createDirectoryByString(pathStringKey);
-	createDirectoryByString(pathStringFile);
+    createDirectoryByString(pathString);
+    createDirectoryByString(pathStringUser);
+    createDirectoryByString(pathStringKey);
+    createDirectoryByString(pathStringFile);
 }
 
 void Global::set_baseName()
 {
-	WriteLine("ÇëÊäÈëÏîÄ¿ÎÄ¼ş¼ĞµÄ´æ·ÅÎ»ÖÃ£¬Ä¬ÈÏ£ºD:\\£¬ÊäÈëq¿ÉÌø¹ı¡££¨¸÷¼¶Ä¿Â¼¼ä¸÷ÓÃ1¸öĞ±¸Ü·Ö¸ô£©");
-	string basename;
-	getline(cin, basename);
+    WriteLine("è¯·è¾“å…¥é¡¹ç›®æ–‡ä»¶å¤¹çš„å­˜æ”¾ä½ç½®ï¼Œé»˜è®¤ï¼šD:\\ï¼Œè¾“å…¥qå¯è·³è¿‡ã€‚ï¼ˆå„çº§ç›®å½•é—´å„ç”¨1ä¸ªæ–œæ åˆ†éš”ï¼‰");
+    string basename;
+    basename = "q";
+    //getline(cin, basename);
 
-	if (basename != "q")
-	{
-		baseName = basename;
-	}
-	else
-	{
-		baseName = "D:";
-	}
+    if (basename != "q")
+    {
+        baseName = basename;
+    }
+    else
+    {
+        baseName = "D:";
+    }
 
-	pathString = conbineStrings(baseName, folderName);
-	pathStringUser = conbineStrings(pathString, globalGetUserName());
-	pathStringKey = conbineStrings(pathStringUser, folderName1);
-	pathStringFile = conbineStrings(pathStringUser, folderName2);
+    pathString = conbineStrings(baseName, folderName);
+    pathStringUser = conbineStrings(pathString, globalGetUserName());
+    pathStringKey = conbineStrings(pathStringUser, folderName1);
+    pathStringFile = conbineStrings(pathStringUser, folderName2);
 
 
 }

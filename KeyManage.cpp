@@ -3,8 +3,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
-#pragma comment(lib,"ipworksopenpgp22.lib")
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgp.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgpkey.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qopenpgp.h"
+
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib\\ipworksopenpgp22.lib")
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib64\\ipworksopenpgp22.lib")
 
 #include <vector>
 #include <Windows.h>
@@ -14,6 +18,7 @@ using namespace std;
 #include "main.h"
 #include "KeyManage.h"
 #include "global.h"
+#include "mainwindow.h"
 
 
 KeyManage::~KeyManage()
@@ -23,43 +28,44 @@ KeyManage::~KeyManage()
 
 void KeyManage::init(Global global, User user)
 {
-	keyGlobal.pathString = global.pathString; 
-	keyGlobal.pathStringFile = global.pathStringFile;
-	keyGlobal.pathStringKey = global.pathStringKey;
-	keyGlobal.pathStringUser = global.pathStringUser;
+    keyGlobal.pathString = global.pathString;
+    keyGlobal.pathStringFile = global.pathStringFile;
+    keyGlobal.pathStringKey = global.pathStringKey;
+    keyGlobal.pathStringUser = global.pathStringUser;
 
-	keyUser.userID = user.getUserID();
+    keyUser.userID = user.getUserID();
 
 }
 
 
 void KeyManage::GenerateKeyPairRSA(string userID, string pwd)
 {
-	WriteLine("Éú³ÉÓÃ»§ÃÜÔ¿");
-	WriteLine("------------");
+    WriteLine("ç”Ÿæˆç”¨æˆ·å¯†é’¥");
+    WriteLine("------------");
 
-	string keyFile = conbineStrings(keyGlobal.pathStringKey, "key-store");
-	createDirectoryByString(keyFile);
+    string keyFile = conbineStrings(keyGlobal.pathStringKey, "key-store");
+    createDirectoryByString(keyFile);
 
-	string keyringDir = keyFile;
+    string keyringDir = keyFile;
 
-	keymgr.LoadKeyring(keyringDir.c_str());
-	keymgr.ListKeys();
+    keymgr.LoadKeyring(keyringDir.c_str());
+    keymgr.ListKeys();
 
 /*
-* ´Ë·½·¨½«µ±Ç°ÃÜÔ¿»·±£´æµ½´ÅÅÌ¡£ ÓĞÁ½¸öÊä³öÑ¡Ïî¡£ÃÜÔ¿»·¿ÉÒÔ±£´æµ½µ¥¸öÃÜÔ¿ÎÄ¼ş£¬Ò²¿ÉÒÔ±£´æµ½Ä¿Â¼ÖĞ¡£
-* ½«ÃÜÔ¿»·±£´æµ½ÉèÖÃÎªÂ·¾¶µÄÄ¿Â¼¡£¸ÃÄ¿Â¼±ØĞëÒÑ´æÔÚ¡£
-* ¸ÃÀà½«ÔÚÖ¸¶¨Ä¿Â¼ÖĞ´´½¨Ò»¸ö¡°pubring.gpg¡±ºÍ¡°secring.gpg¡±ÎÄ¼ş¡£Èç¹ûÎÄ¼şÒÑ´æÔÚ£¬ËüÃÇ½«±»¸²¸Ç¡£
+* æ­¤æ–¹æ³•å°†å½“å‰å¯†é’¥ç¯ä¿å­˜åˆ°ç£ç›˜ã€‚ æœ‰ä¸¤ä¸ªè¾“å‡ºé€‰é¡¹ã€‚å¯†é’¥ç¯å¯ä»¥ä¿å­˜åˆ°å•ä¸ªå¯†é’¥æ–‡ä»¶ï¼Œä¹Ÿå¯ä»¥ä¿å­˜åˆ°ç›®å½•ä¸­ã€‚
+* å°†å¯†é’¥ç¯ä¿å­˜åˆ°è®¾ç½®ä¸ºè·¯å¾„çš„ç›®å½•ã€‚è¯¥ç›®å½•å¿…é¡»å·²å­˜åœ¨ã€‚
+* è¯¥ç±»å°†åœ¨æŒ‡å®šç›®å½•ä¸­åˆ›å»ºä¸€ä¸ªâ€œpubring.gpgâ€å’Œâ€œsecring.gpgâ€æ–‡ä»¶ã€‚å¦‚æœæ–‡ä»¶å·²å­˜åœ¨ï¼Œå®ƒä»¬å°†è¢«è¦†ç›–ã€‚
 * KeyringPath.
 */
-	int ret_code = keymgr.CreateKey(userID.c_str(), pwd.c_str());
+    int ret_code = keymgr.CreateKey(userID.c_str(), pwd.c_str());
 
-	if (ret_code == 0)
-		cout << "Key has been generated! The UserID is: " << userID << ", The pwd is: " << pwd << endl;
+    if (ret_code == 0){
+        cout << "Key has been generated! The UserID is: " << userID << ", The pwd is: " << pwd << endl;
+    }
 
-	int save_code = keymgr.SaveKeyring(keyringDir.c_str());
-	if (save_code == 0)
-		cout << "Key has been saved at: " << keyringDir << endl;
+    int save_code = keymgr.SaveKeyring(keyringDir.c_str());
+    if (save_code == 0)
+        cout << "Key has been saved at: " << keyringDir << endl;
 
 
 
@@ -68,55 +74,55 @@ void KeyManage::GenerateKeyPairRSA(string userID, string pwd)
 
 void KeyManage::ExportPublicKey(string userID, string pwd)
 {
-	string filePublicKkey = conbineStrings(keyGlobal.pathStringKey, "public-key-exported.asc");
+    string filePublicKkey = conbineStrings(keyGlobal.pathStringKey, "public-key-exported.asc");
 
-	// should the exported files be ASCII or binary
-	bool asciiArmored = true;
+    // should the exported files be ASCII or binary
+    bool asciiArmored = true;
 
-	// ĞÂ½¨»ò¸²¸ÇÎÄ¼şpublic-key-exported.asc£¬²¢µ¼³ö¹«Ô¿µ½ÎÄ¼ş£¬ÔÚfilePublicKkeyÄ¿Â¼ÏÂ
-	keymgr.ExportPublicKey(filePublicKkey.c_str(), asciiArmored);
+    // æ–°å»ºæˆ–è¦†ç›–æ–‡ä»¶public-key-exported.ascï¼Œå¹¶å¯¼å‡ºå…¬é’¥åˆ°æ–‡ä»¶ï¼Œåœ¨filePublicKkeyç›®å½•ä¸‹
+    keymgr.ExportPublicKey(filePublicKkey.c_str(), asciiArmored);
 
 
 }
 
 void KeyManage::ExportPrivateKey(string userID, string pwd)
 {
-	string filePrivateKkey = conbineStrings(keyGlobal.pathStringKey, "private-key-exported.asc");
+    string filePrivateKkey = conbineStrings(keyGlobal.pathStringKey, "private-key-exported.asc");
 
-	// should the exported files be ASCII or binary
-	bool asciiArmored = true;
+    // should the exported files be ASCII or binary
+    bool asciiArmored = true;
 
-	// ĞÂ½¨»ò¸²¸ÇÎÄ¼şpublic-key-exported.asc£¬²¢µ¼³ö¹«Ô¿µ½ÎÄ¼ş£¬ÔÚfilePublicKkeyÄ¿Â¼ÏÂ
-	keymgr.ExportSecretKey(filePrivateKkey.c_str(), asciiArmored);
+    // æ–°å»ºæˆ–è¦†ç›–æ–‡ä»¶public-key-exported.ascï¼Œå¹¶å¯¼å‡ºå…¬é’¥åˆ°æ–‡ä»¶ï¼Œåœ¨filePublicKkeyç›®å½•ä¸‹
+    keymgr.ExportSecretKey(filePrivateKkey.c_str(), asciiArmored);
 
 
 }
 
 void KeyManage::KeyStoreListKeys(string pwd)
 {
-	string keyFile = conbineStrings(keyGlobal.pathStringKey, "key-store");
-	string keyringDir = keyFile;
+    string keyFile = conbineStrings(keyGlobal.pathStringKey, "key-store");
+    string keyringDir = keyFile;
 
-	WriteLine("Listing Keys...");
-	WriteLine("User Id------Key Id------Private Key");
+    WriteLine("Listing Keys...");
+    WriteLine("User Id------Key Id------Private Key");
 
-	keymgr.LoadKeyring(keyringDir.c_str());
-	keymgr.ListKeys();
+    keymgr.LoadKeyring(keyringDir.c_str());
+    keymgr.ListKeys();
 
-	/*
-	// µ÷ÊÔÊ±£¬ÈçĞèÉ¾³ıkey£¬´ò¿ª´Ë×¢ÊÍ
-	while (1)
-	{
-		char userid[100];
-		printf("User Id: ");
-		fgets(userid, 100, stdin);
-		userid[strlen(userid) - 1] = '\0';
-		cout << keymgr.DeleteKey(userid) << endl;
+    /*
+    // è°ƒè¯•æ—¶ï¼Œå¦‚éœ€åˆ é™¤keyï¼Œæ‰“å¼€æ­¤æ³¨é‡Š
+    while (1)
+    {
+        char userid[100];
+        printf("User Id: ");
+        fgets(userid, 100, stdin);
+        userid[strlen(userid) - 1] = '\0';
+        cout << keymgr.DeleteKey(userid) << endl;
 
-		keymgr.SaveKeyring(keyringDir.c_str());
+        keymgr.SaveKeyring(keyringDir.c_str());
 
-		keymgr.ListKeys();
-	}
-	*/
+        keymgr.ListKeys();
+    }
+    */
 
 }

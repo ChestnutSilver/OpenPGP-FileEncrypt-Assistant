@@ -3,8 +3,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
-#pragma comment(lib,"ipworksopenpgp22.lib")
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgp.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgpkey.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qopenpgp.h"
+
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib\\ipworksopenpgp22.lib")
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib64\\ipworksopenpgp22.lib")
 
 #include <vector>
 #include <Windows.h>
@@ -19,15 +23,15 @@ User::User()
 {
     //GetUserName();
 /*
-* ´ËC++´úÂëÊ¹ÓÃWindows API¼ìË÷µ±Ç°ÓÃ»§µÄ°²È«±êÊ¶·û£¨SID£©£¬È»ºóÊ¹ÓÃLookupAccountSid£¨£©»ñÈ¡Óë¸ÃSID¹ØÁªµÄÓÃ»§ÃûºÍÓòÃû£¬È»ºó½«Æä´òÓ¡µ½¿ØÖÆÌ¨¡£
+* æ­¤C++ä»£ç ä½¿ç”¨Windows APIæ£€ç´¢å½“å‰ç”¨æˆ·çš„å®‰å…¨æ ‡è¯†ç¬¦ï¼ˆSIDï¼‰ï¼Œç„¶åä½¿ç”¨LookupAccountSidï¼ˆï¼‰è·å–ä¸è¯¥SIDå…³è”çš„ç”¨æˆ·åå’ŒåŸŸåï¼Œç„¶åå°†å…¶æ‰“å°åˆ°æ§åˆ¶å°ã€‚
 *
-* ÔÚC++´úÂëÖĞ£¬szUserNameºÍszDomainNameÊÇ×Ö·ûÊı×é£¬ÓÃÓÚ´æ´¢LookupAccountSid£¨£©º¯Êı¼ìË÷µ½µÄÓÃ»§ÃûºÍÓòÃû¡£
-* µ÷ÓÃLookupAccountSid£¨£©Ê±£¬º¯Êı»á½«¼ìË÷µ½µÄÓÃ»§ÃûºÍÓòÃû·Ö±ğĞ´ÈëszUserNameºÍszDomainNameÌá¹©µÄ»º³åÇø¡£»º³åÇøµÄ´óĞ¡·Ö±ğ×÷ÎªdwUserNameSizeºÍdwDomainNameSize´«Èë¡£
-* µ÷ÓÃLookupAccountSid£¨£©ºó£¬szUserNameºÍszDomainName»º³åÇøÓÃÓÚÊ¹ÓÃprintf£¨£©½«µ±Ç°ÓÃ»§ÃûÒÔ¡°domain\\username¡±¸ñÊ½´òÓ¡µ½¿ØÖÆÌ¨¡£
+* åœ¨C++ä»£ç ä¸­ï¼ŒszUserNameå’ŒszDomainNameæ˜¯å­—ç¬¦æ•°ç»„ï¼Œç”¨äºå­˜å‚¨LookupAccountSidï¼ˆï¼‰å‡½æ•°æ£€ç´¢åˆ°çš„ç”¨æˆ·åå’ŒåŸŸåã€‚
+* è°ƒç”¨LookupAccountSidï¼ˆï¼‰æ—¶ï¼Œå‡½æ•°ä¼šå°†æ£€ç´¢åˆ°çš„ç”¨æˆ·åå’ŒåŸŸååˆ†åˆ«å†™å…¥szUserNameå’ŒszDomainNameæä¾›çš„ç¼“å†²åŒºã€‚ç¼“å†²åŒºçš„å¤§å°åˆ†åˆ«ä½œä¸ºdwUserNameSizeå’ŒdwDomainNameSizeä¼ å…¥ã€‚
+* è°ƒç”¨LookupAccountSidï¼ˆï¼‰åï¼ŒszUserNameå’ŒszDomainNameç¼“å†²åŒºç”¨äºä½¿ç”¨printfï¼ˆï¼‰å°†å½“å‰ç”¨æˆ·åä»¥â€œdomain\\usernameâ€æ ¼å¼æ‰“å°åˆ°æ§åˆ¶å°ã€‚
 *
-* ÔÚÕâ¸öĞŞ¸ÄºóµÄ´úÂëÖĞ£¬ÎÒÃÇ½«szUserNameºÍszDomainNameµÄÀàĞÍ¸ü¸ÄÎªwchar_t£¬ÕâÊÇWindows APIº¯ÊıÊ¹ÓÃµÄ¿í×Ö·ûÀàĞÍ¡£
-* ÎÒÃÇ»¹½«Á½¸ö»º³åÇøµÄ´óĞ¡¼ÆËã¸ü¸ÄÎªwchar_t£¬¶ø²»ÊÇchar¡£
-* ×îºó£¬ÎÒÃÇÊ¹ÓÃwprintf£¨£©½«µ±Ç°ÓÃ»§Ãû´òÓ¡µ½¿ØÖÆÌ¨£¬Ê¹ÓÃ%s¸ñÊ½ËµÃ÷·ûºÍ¿í×Ö·û´®szDomainNameºÍszUserName¡£
+* åœ¨è¿™ä¸ªä¿®æ”¹åçš„ä»£ç ä¸­ï¼Œæˆ‘ä»¬å°†szUserNameå’ŒszDomainNameçš„ç±»å‹æ›´æ”¹ä¸ºwchar_tï¼Œè¿™æ˜¯Windows APIå‡½æ•°ä½¿ç”¨çš„å®½å­—ç¬¦ç±»å‹ã€‚
+* æˆ‘ä»¬è¿˜å°†ä¸¤ä¸ªç¼“å†²åŒºçš„å¤§å°è®¡ç®—æ›´æ”¹ä¸ºwchar_tï¼Œè€Œä¸æ˜¯charã€‚
+* æœ€åï¼Œæˆ‘ä»¬ä½¿ç”¨wprintfï¼ˆï¼‰å°†å½“å‰ç”¨æˆ·åæ‰“å°åˆ°æ§åˆ¶å°ï¼Œä½¿ç”¨%sæ ¼å¼è¯´æ˜ç¬¦å’Œå®½å­—ç¬¦ä¸²szDomainNameå’ŒszUserNameã€‚
 */
     HANDLE hToken;
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
@@ -57,7 +61,7 @@ User::User()
                         sid = pSid;
                         if (!ConvertSidToStringSidW(sid, &stringSid))
                         {
-                            //wmic useraccount get name, sid Ö¸Áî¿ÉÔÚcmd´°¿Ú²é¿´±¾»ú¸÷ÓÃ»§µÄsid
+                            //wmic useraccount get name, sid æŒ‡ä»¤å¯åœ¨cmdçª—å£æŸ¥çœ‹æœ¬æœºå„ç”¨æˆ·çš„sid
                             std::cout << "Failed to convert to string: error code " << GetLastError() << std::endl;
                             FreeSid(sid);
                             return;

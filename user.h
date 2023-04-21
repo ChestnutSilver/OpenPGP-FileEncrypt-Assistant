@@ -1,11 +1,18 @@
+#ifndef USER_H
+#define USER_H
+
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
-#pragma comment(lib,"ipworksopenpgp22.lib")
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgp.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgpkey.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qopenpgp.h"
+
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib\\ipworksopenpgp22.lib")
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib64\\ipworksopenpgp22.lib")
 
 #include <vector>
 #include <Windows.h>
@@ -17,7 +24,7 @@ using namespace std;
 #include "main.h"
 
 template <typename T>
-string ToString(T value) 
+string ToString(T value)
 {
     stringstream os;
     os << value;
@@ -28,13 +35,12 @@ string ToString(T value)
 class User
 {
 private:
-    string username;		//ÓÃ»§Ãû
-    PSID sid;		//ÓÃ»§°²È«±êÊ¶·û
-    LPWSTR stringSid;  //ÓÃ»§°²È«±êÊ¶·û£¬LPWSTR¸ñÊ½
+    string username;		//ç”¨æˆ·å
+    PSID sid;		//ç”¨æˆ·å®‰å…¨æ ‡è¯†ç¬¦
+    LPWSTR stringSid;  //ç”¨æˆ·å®‰å…¨æ ‡è¯†ç¬¦ï¼ŒLPWSTRæ ¼å¼
     string userID;
-    vector<string> allUsers;//´æÊÚÈ¨ID£¬º¬µ±Ç°ÓÃ»§***********
     vector<string> allAuthorizedUsers;
-    vector<string> allAuthorizedUersPublicKey;  //ËùÓÐÓÃ»§Ä¿Â¼ÎÄ¼þ
+    vector<string> allAuthorizedUersPublicKey;  //æ‰€æœ‰ç”¨æˆ·ç›®å½•æ–‡ä»¶
 
 public:
     User();
@@ -43,10 +49,10 @@ public:
     PSID getSid();
     LPWSTR getStringSid();
     string getUserID();
-
-    //»¹ÓÐÒ»¸ö»ñÈ¡ÊÚÈ¨ÓÃ»§µÄº¯Êý£¬Ñ¯ÎÊÊÇ·ñÊÚÈ¨£¬ÊÚÈ¨Ôò¼Ó½øÈ¥*************
-
-    vector<string> getAllUsers();//·µ»ØËùÓÐÊÚÈ¨ÓÃ»§£¬return allusers***********
     ~User();
 };
+
+
+
+#endif // USER_H
 

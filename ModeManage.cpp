@@ -4,8 +4,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
-#pragma comment(lib,"ipworksopenpgp22.lib")
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgp.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgpkey.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qopenpgp.h"
+
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib\\ipworksopenpgp22.lib")
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib64\\ipworksopenpgp22.lib")
 
 #include <vector>
 #include <Windows.h>
@@ -27,160 +31,155 @@ ModeManage::~ModeManage()
 
 int ModeManage::modeInput(Global global, User user)
 {
-	modeGlobal.pathString = global.pathString;
-	modeGlobal.pathStringFile = global.pathStringFile;
-	modeGlobal.pathStringKey = global.pathStringKey;
-	modeGlobal.pathStringUser = global.pathStringUser;
+    modeGlobal.pathString = global.pathString;
+    modeGlobal.pathStringFile = global.pathStringFile;
+    modeGlobal.pathStringKey = global.pathStringKey;
+    modeGlobal.pathStringUser = global.pathStringUser;
 
-	while (true)
-	{
-		WriteLine("Ä£Ê½Ñ¡Ôñ£º1->Ô­ÀíÕ¹Ê¾£¬2->´æ´¢ÎÄ¼ş£¬3->µ÷ÔÄÎÄ¼ş");
-		string mode;
-		getline(cin, mode);
-		if (mode == "1")
-		{
-			WriteLine("Ô­ÀíÕ¹Ê¾");
-			return 1;
-		}
-		else if (mode == "2")
-		{
-			WriteLine("ÎÄ¼ş´æ´¢");
-			WriteLine("´æ´¢ÎÄ¼şµÄ°²È«Ä£Ê½£º1->µ¥ÓÃ»§£¬2->¶àÓÃ»§");
-			while (true)
-			{
-				string subMode;
-				cin >> subMode;
-				if (subMode == "1")
-				{
-					WriteLine("µ¥ÓÃ»§Ä£Ê½");
-					WriteLine("ÇëÊäÈëÎÄ¼şÂ·¾¶");
-					return 21;
-				}
-				else if (subMode == "2")
-				{
-					WriteLine("¶àÓÃ»§Ä£Ê½");
+    while (true)
+    {
+        WriteLine("Select Mode: 1->Show Principle, 2->Store Files, 3->Access Files.");
+        string mode;
+        mode = "1";
 
-					//user.User_Authorization();
 
-					WriteLine("ÇëÊäÈëÎÄ¼şÂ·¾¶");
-					return 22;
-				}
-				else
-				{
-					WriteLine("Î´Öª²ÎÊı£¬ÇëÖØĞÂÊäÈë¡£");
-				}
-			}
-		}
-		else if (mode == "3")
-		{
-			WriteLine("ÎÄ¼şµ÷ÔÄ");
-			WriteLine("ÇëÊäÈëÎÄ¼şÂ·¾¶(ºó×ºÎª.gpg)");
-			return 3;
-		}
-		else
-		{
-			WriteLine("Î´Öª²ÎÊı£¬ÇëÖØĞÂÊäÈë¡£");
-		}
-	}
+
+
+
+        //cin >> mode;
+        if (mode == "1")
+        {
+            WriteLine("Show Principle");
+            return 1;
+        }
+        else if (mode == "2")
+        {
+            WriteLine("Store Files");
+            WriteLine("å­˜å‚¨æ–‡ä»¶çš„å®‰å…¨æ¨¡å¼ï¼š1->å•ç”¨æˆ·ï¼Œ2->å¤šç”¨æˆ·");
+            while (true)
+            {
+                string subMode;
+                cin >> subMode;
+                if (subMode == "1")
+                {
+                    WriteLine("å•ç”¨æˆ·æ¨¡å¼");
+                    WriteLine("è¯·è¾“å…¥æ–‡ä»¶è·¯å¾„");
+                    return 21;
+                }
+                else if (subMode == "2")
+                {
+                    WriteLine("å¤šç”¨æˆ·æ¨¡å¼");
+
+                    //user.User_Authorization();
+
+                    WriteLine("è¯·è¾“å…¥æ–‡ä»¶è·¯å¾„");
+                    return 22;
+                }
+                else
+                {
+                    WriteLine("æœªçŸ¥å‚æ•°ï¼Œè¯·é‡æ–°è¾“å…¥ã€‚");
+                }
+            }
+        }
+        else if (mode == "3")
+        {
+            WriteLine("Access Files");
+            WriteLine("è¯·è¾“å…¥æ–‡ä»¶è·¯å¾„(åç¼€ä¸º.gpg)");
+            return 3;
+        }
+        else
+        {
+            WriteLine("æœªçŸ¥å‚æ•°ï¼Œè¯·é‡æ–°è¾“å…¥ã€‚");
+        }
+    }
 }
-
 void ModeManage::modeControl(int mode, User user, string pwd)
 {
-	if (mode == 1)
-	{
-		//Ç©Ãû¼ÓÃÜ×Ö·û´®
-		FileManage fileManage;
-		fileManage.SignAndEncryptString(pwd, user.getUserID(), modeGlobal.pathStringKey);
+    if (mode == 1)
+    {
+        //ç­¾ååŠ å¯†å­—ç¬¦ä¸²
+        FileManage fileManage;
+        fileManage.SignAndEncryptString(pwd, user.getUserID(), modeGlobal.pathStringKey);
 
-		//½âÃÜ²¢ÑéÖ¤Ç©Ãû
-		//fileManage.DecryptAndVerifyString("a", pwd, user.getUserID());
+        //è§£å¯†å¹¶éªŒè¯ç­¾å
+        //fileManage.DecryptAndVerifyString("a", pwd, user.getUserID());
 
-		WriteLine("--------------");
-			
-	}
-	else if (mode == 21)
-	{
-		string filePath;
-		getline(cin, filePath);
-		while (true)
-		{
-			if (!_access(filePath.c_str(), 0))
-			{
-				FileManage fileManage;
-				string outputFile = fileManage.SignAndEncryptSingle(pwd, filePath, user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
-				bool check = fileManage.VerifySingle(fileManage.modeUserIDPwd.modePwd, outputFile, fileManage.modeUserIDPwd.modeUserID, modeGlobal.pathStringFile, modeGlobal.pathStringKey);
-				//bool check = fileManage.VerifySingle(pwd, outputFile, user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
-				if (check)
-				{
-					WriteLine(("ÎÄ¼ş´æ´¢³É¹¦£¬²¢ÓÉÓÃ»§ " + user.getUsername() + " Ç©Ãû¡£"));
-					WriteLine(("Ç©ÃûµÄ¼ÓÃÜÎÄ¼ş£¬´æ´¢ÔÚ: "));
-					WriteLine(outputFile);
+        WriteLine("--------------");
 
-					WriteLine("Success 2-1: µ¥ÓÃ»§Ä£Ê½ÏÂ£¬ÓÃ»§ÄÜ¹»¶ÔÎÄ¼ş¼ÓÃÜ²¢´æ´¢£¬²¢Í¨¹ıÇ©ÃûÕæÊµĞÔÈÏÖ¤£¬²¢ÇÒÄÜ¹»½âÃÜÎÄ¼ş£¡");
-				}
-				else
-				{
-					//cleardeletfile outputfile
-					WriteLine("21-test-exp2");
-				}
-				WriteLine("--------------");
-				break;
-			}
-			else
-			{
-				WriteLine("ÎÄ¼ş²»´æÔÚ£¬ÇëÖØĞÂÊäÈëÎÄ¼şÂ·¾¶");
-				getline(cin, filePath);
-			}
-		}
-	}
-	else if (mode == 22)
-	{
-		string filePath;
-		getline(cin, filePath);
-		while (true)
-		{
-			if (!_access(filePath.c_str(), 0))
-			{
-				FileManage fileManage;
-				string outputFile = fileManage.SignAndEncryptMultiple(pwd, filePath, user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
-				bool check = fileManage.Verify(fileManage.modeUserIDPwd.modePwd, outputFile, fileManage.modeUserIDPwd.modeUserID, modeGlobal.pathStringFile, modeGlobal.pathStringKey);
-				if (check)
-				{
-					WriteLine(("ÎÄ¼ş´æ´¢³É¹¦£¬²¢ÓÉÓÃ»§ " + user.getUsername() + " Ç©Ãû¡£"));
-					WriteLine(("Ç©ÃûµÄ¼ÓÃÜÎÄ¼ş£¬´æ´¢ÔÚ: "));
-					WriteLine(outputFile);
+    }
+    else if (mode == 21)
+    {
+        //******************************************************************
+        /*string filePath;
+        WriteLine("21-test");
+        getline(cin, filePath);
+        while (true)
+        {
+            if (!_access(filePath.c_str(), 0))
+            {
+                FileManage fileManage;
 
-					WriteLine("Success 2-2: ¶àÓÃ»§Ä£Ê½ÏÂ£¬AÓÃ»§ÄÜ¹»¶ÔÎÄ¼ş¼ÓÃÜ¡¢Ç©Ãû²¢´æ´¢£¬²¢ÇÒBÓÃ»§ÄÜ¹»½øĞĞÕæÊµĞÔÈÏÖ¤£¬²¢½âÃÜÎÄ¼ş£¡");
-				}
-				else
-				{
-					//cleardeletfile outputfile
-					WriteLine("21-test-exp2");
-				}
-				WriteLine("--------------");
-				break;
-			}
-			else
-			{
-				WriteLine("ÎÄ¼ş²»´æÔÚ£¬ÇëÖØĞÂÊäÈëÎÄ¼şÂ·¾¶");
-				getline(cin, filePath);
-			}
-		}
-	}
-	else if (mode == 3)
-	{
-		FileManage fileManage;
-		string outputFile;
-		getline(cin, outputFile);
-		bool check = fileManage.Verify(fileManage.modeUserIDPwd.modePwd, outputFile, fileManage.modeUserIDPwd.modeUserID, modeGlobal.pathStringFile, modeGlobal.pathStringKey);
+                string outputFile = fileManage.SignAndEncryptSingle(pwd, filePath, user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
+                bool check = fileManage.VerifySingle(pwd, outputFile, user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
+                if (check)
+                {
+                    string temp = "æ–‡ä»¶å­˜å‚¨æˆåŠŸï¼Œå¹¶ç”±ç”¨æˆ·" + user.getUsername() + "ç­¾åï¼Œåœ¨" + outputFile + "ä¸­";//username???
+                    WriteLine(temp);
+                }
+                else
+                {
+                    //cleardeletfile outputfile
+                    WriteLine("21-test-exp2");
+                }
+                WriteLine("--------------");
+                break;
+            }
+            else
+            {
+                WriteLine("æ–‡ä»¶ä¸å­˜åœ¨ï¼Œè¯·é‡æ–°è¾“å…¥æ–‡ä»¶è·¯å¾„");
+                getline(cin, filePath);
+            }
+        }*/
+        /******************************************************************
+    }
+    else if (mode == 22)
+    {
+        /******************************************************************
+        string filePath;
+        getline(cin, filePath);
+        while (true)
+        {
+            if (!_access(filePath.c_str(), 0))
+            {
+                FileManage fileManage;
+                string outputFile = fileManage.SignAndEncryptMultiple(pwd, filePath, user.getAllUsers(),user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
+                bool check = fileManage.Verify(pwd, outputFile, user.getAllUsers(), user.getUserID(), modeGlobal.pathStringFile, modeGlobal.pathStringKey);
+                if (check)
+                {
+                    string temp = "æ–‡ä»¶å­˜å‚¨æˆåŠŸï¼Œå¹¶ç”±ç”¨æˆ·" + user.getUsername() + "ç­¾åï¼Œåœ¨" + outputFile + "ä¸­";//username???
+                    WriteLine(temp);
+                }
+                else
+                {
+                    //cleardeletfile outputfile
+                }
+                WriteLine("--------------");
+                break;
+            }
+            else
+            {
+                WriteLine("æ–‡ä»¶ä¸å­˜åœ¨ï¼Œè¯·é‡æ–°è¾“å…¥æ–‡ä»¶è·¯å¾„");
+                getline(cin, filePath);
+            }
+        }
+        //******************************************************************/
+    }
+    else if (mode == 3)
+    {
 
-		if (check)
-		{
-			WriteLine("Success 3: µ¥ÓÃ»§Óë¶àÓÃ»§Ä£Ê½ÏÂ£¬A¡¢BÓÃ»§ÄÜ¹»½âÃÜ×Ô¼ºÓµÓĞµ÷ÔÄÈ¨ÏŞµÄÎÄ¼ş£¡");
-		}
-	}
-	else
-	{
-		WriteLine("Î´Öª´íÎó¡£");
-	}
+    }
+    else
+    {
+        WriteLine("æœªçŸ¥é”™è¯¯ã€‚");
+    }
 }

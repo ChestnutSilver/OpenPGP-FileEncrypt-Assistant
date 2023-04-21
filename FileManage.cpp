@@ -3,8 +3,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "D:/preopengpg/IPWorks OpenPGP 2022 C++ Edition/include/ipworksopenpgp.h"
-#pragma comment(lib,"ipworksopenpgp22.lib")
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgp.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qipworksopenpgpkey.h"
+#include "D:\preopengpg\IPWorks-OpenPGP-2022-C++-Edition-2\include\qt\qopenpgp.h"
+
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib\\ipworksopenpgp22.lib")
+#pragma comment(lib,"D:\\preopengpg\\IPWorks-OpenPGP-2022-C++-Edition-2\\lib64\\ipworksopenpgp22.lib")
 
 #include <vector>
 #include <Windows.h>
@@ -15,7 +19,15 @@ using namespace std;
 #include "global.h"
 #include "FileManage.h"
 #include "KeyManage.h"
+#include "mainwindow.h"
+#include <QString>
+#include <QMessageBox>
+#include <QLabel>
+#include <QDebug>
+#include <QStack>
 #define LINE_LEN 100
+
+
 
 FileManage::~FileManage()
 {
@@ -34,6 +46,18 @@ void FileManage::SignAndEncryptString(string pwd, string userID, string keyringD
     char recipientKey[LINE_LEN];
     char signerKey[LINE_LEN];
 
+    string mykeyringdir="D:\\OpenPGP_File_Manage_show\\lenovo\\Key\\key-store";
+    string aid="516";
+    string apwd="561";
+
+    strcpy(mykeyringDir,mykeyringdir.c_str());
+    strcpy(passphrase,apwd.c_str());
+    strcpy(privateKey,aid.c_str());
+    strcpy(recipientKey,aid.c_str());
+    strcpy(signerKey,aid.c_str());
+
+
+/*
     printf("Keyring Directory: ");
     fgets(mykeyringDir, LINE_LEN, stdin);
     fgets(mykeyringDir, LINE_LEN, stdin);
@@ -52,13 +76,17 @@ void FileManage::SignAndEncryptString(string pwd, string userID, string keyringD
     printf("Signer Key User Id (Used to verify the signature of an incoming message): ");
     fgets(signerKey, LINE_LEN, stdin);
     signerKey[strlen(signerKey) - 1] = '\0';
-
+*/
     while (1)
     {
         pgp.Reset();
 
         printf("Please enter the message. When finished enter \":q\" on a line by itself:\n");
         char message[100];
+        string msg;
+        msg="6464848";
+        strcpy(message,msg.c_str());
+        /*
         message[0] = '\0';
         while (fgets(command, LINE_LEN, stdin))
         {
@@ -68,9 +96,10 @@ void FileManage::SignAndEncryptString(string pwd, string userID, string keyringD
             strcat(message, command);
             strcat(message, "\n");
         }
-        pgp.SetInputMessage(message, strlen(message));
+        */
+        pgp.SetInputMessage(message);
 
-        
+
         if (strlen(privateKey) <= 0)
         {
             printf("Please select a private key.\n");
@@ -95,24 +124,27 @@ void FileManage::SignAndEncryptString(string pwd, string userID, string keyringD
         pgp.SetRecipientKeyCount(1);
         pgp.SetRecipientKeyKeyring(0, mykeyringDir);
         pgp.SetRecipientKeyUserId(0, recipientKey);
+        pgp.SetOutputFile("D:\\OpenPGP_File_Manage_show\\lenovo\\File\\text4.gpg");
         ret_code = pgp.SignAndEncrypt();
         if (ret_code) goto done;
 
-        if (strlen(pgp.GetOutputFile()) <= 0)
+        //if (strlen(pgp.GetOutputFile()) <= 0)
         {
             printf("\nSigned & Encrypted Message:\n");
-            char* output;
-            int len;
-            pgp.GetOutputMessage(output, len);
-            printf("%s\n", output);
+            //char* output;
+            //int len;
 
-            output[strlen(output) - 1] = '\0';
-            pgp.SetInputMessage(output, strlen(output));
 
-            Output = output;
+            pgp.GetOutputMessage();
+            //printf("%s\n", output);
+
+            //output[strlen(output) - 1] = '\0';
+            //pgp.SetInputMessage(output);
+
+            //Output = output;
         }
-
-        //解密
+/*
+        //瑙ｅ瘑
         pgp.SetKeyCount(1);
         pgp.SetKeyKeyring(0, mykeyringDir);
         pgp.SetKeyUserId(0, privateKey);
@@ -126,15 +158,15 @@ void FileManage::SignAndEncryptString(string pwd, string userID, string keyringD
         ret_code = pgp.DecryptAndVerifySignature();
         if (ret_code) goto done;
 
-        if (strlen(pgp.GetOutputFile()) <= 0)
+        //if (strlen(pgp.GetOutputFile()) <= 0)
         {
             printf("\nDecrypted & Verified Message:\n");
             char* output;
             int len;
-            pgp.GetOutputMessage(output, len);
+            pgp.GetOutputMessage();
             printf("%s\n", output);
         }
-
+*/
         break;
     }
 
@@ -142,285 +174,10 @@ done:
     if (ret_code)     // Got an error.  The user is done.
     {
         printf("\nError: %d", ret_code);
-        if (pgp.GetLastError())
-        {
-            printf(" \"%s\"\n", pgp.GetLastError());
-        }
-    }
-
-}
-
-void FileManage::DecryptAndVerifyString(string signedAndEncryptedMessage, string pwd, string userID)
-{
-    OpenPGP pgp;
-    MyKeyMgr keymgr;
-    int ret_code = 0;
-    char command[LINE_LEN];     // user's command
-    char mykeyringDir[LINE_LEN];
-    char passphrase[LINE_LEN];
-    char privateKey[LINE_LEN];
-    char recipientKey[LINE_LEN];
-    char signerKey[LINE_LEN];
-
-    printf("Keyring Directory: ");
-    fgets(mykeyringDir, LINE_LEN, stdin);
-    mykeyringDir[strlen(mykeyringDir) - 1] = '\0';
-    keymgr.LoadKeyring(mykeyringDir);
-
-    printf("\nPrivate Key User Id (Used to sign outgoing messages and decrypt incoming messages): ");
-    fgets(privateKey, LINE_LEN, stdin);
-    privateKey[strlen(privateKey) - 1] = '\0';
-    printf("Passphrase: ");
-    fgets(passphrase, LINE_LEN, stdin);
-    passphrase[strlen(passphrase) - 1] = '\0';
-    printf("Recipient Key User Id (Used to encrypt outgoing messages): ");
-    fgets(recipientKey, LINE_LEN, stdin);
-    recipientKey[strlen(recipientKey) - 1] = '\0';
-    printf("Signer Key User Id (Used to verify the signature of an incoming message): ");
-    fgets(signerKey, LINE_LEN, stdin);
-    signerKey[strlen(signerKey) - 1] = '\0';
-
-    while (1)
-    {
-        if (strlen(privateKey) <= 0)
-        {
-            printf("Please select a private key.\n");
-            break;
-        }
-
-        Output[strlen(Output) - 1] = '\0';
-        pgp.SetInputMessage(Output, strlen(Output));
-
-        //解密
-        pgp.SetKeyCount(1);
-        pgp.SetKeyKeyring(0, mykeyringDir);
-        pgp.SetKeyUserId(0, privateKey);
-        pgp.SetKeyPassphrase(0, passphrase);
-        pgp.SetSignerKeyCount(1);
-        pgp.SetSignerKeyKeyring(0, mykeyringDir);
-        pgp.SetSignerKeyUserId(0, signerKey);
-        ret_code = pgp.DecryptAndVerifySignature();
-        if (ret_code) goto done;
-
-        if (strlen(pgp.GetOutputFile()) <= 0)
-        {
-            printf("\nDecrypted & Verified Message:\n");
-            char* output;
-            int len;
-            pgp.GetOutputMessage(output, len);
-            printf("%s\n", output);
-        }
-    }
-
-done:
-    if (ret_code)     // Got an error.  The user is done.
-    {
-        printf("\nError: %d", ret_code);
-        if (pgp.GetLastError())
-        {
-            printf(" \"%s\"\n", pgp.GetLastError());
-        }
-    }
-
-    fprintf(stderr, "\npress <return> to continue...\n");
-    getchar();
-    exit(ret_code);
-}
-
-
-string FileManage::SignAndEncryptSingle(string pwd, string filePath, string userID, string pathStringFile, string keyringDir)
-{
-    keyringDir = conbineStrings(keyringDir, "key-store");
-
-    string newFile = ToString(userID) + "Encrypted.gpg"; //生成文件名为 userID + Encrypted.gpg
-    string outputFile = conbineStrings(pathStringFile, newFile);
-
-    char passphrase[LINE_LEN];
-    char privateKey[LINE_LEN];
-    char recipientKey[LINE_LEN];
-    char signerKey[LINE_LEN];
-
-    printf("\nPrivate Key User Id (Used to sign outgoing messages and decrypt incoming messages): ");
-    fgets(privateKey, LINE_LEN, stdin);
-    privateKey[strlen(privateKey) - 1] = '\0';
-    printf("Passphrase: ");
-    fgets(passphrase, LINE_LEN, stdin);
-    passphrase[strlen(passphrase) - 1] = '\0';
-    printf("Recipient Key User Id (Used to encrypt outgoing messages): ");
-    fgets(recipientKey, LINE_LEN, stdin);
-    recipientKey[strlen(recipientKey) - 1] = '\0';
-    printf("Signer Key User Id (Used to verify the signature of an incoming message): ");
-    fgets(signerKey, LINE_LEN, stdin);
-    signerKey[strlen(signerKey) - 1] = '\0';
-
-    modeUserIDPwd.modeUserID = privateKey;
-    modeUserIDPwd.modePwd = passphrase;
-
-    OpenPGP pgp;
-    pgp.SetInputFile(filePath.c_str());
-    pgp.SetOutputFile(outputFile.c_str());
-
-    pgp.SetASCIIArmor(true);
-    pgp.SetOverwrite(true);//覆盖写
-    pgp.SetKeyCount(1);
-    pgp.SetKeyKeyring(0, keyringDir.c_str());
-    pgp.SetKeyUserId(0, privateKey);
-    pgp.SetKeyPassphrase(0, passphrase);
-    pgp.SetRecipientKeyCount(1);
-    pgp.SetRecipientKeyKeyring(0, keyringDir.c_str());
-    pgp.SetRecipientKeyUserId(0, recipientKey);
-
-    int ret_code = pgp.SignAndEncrypt();
-    cout << ret_code << endl;
-    if (ret_code)     // Got an error.  The user is done.
-    {
-        printf("\nError: %d", ret_code);
-        if (pgp.GetLastError())
-        {
-            printf(" \"%s\"\n", pgp.GetLastError());
-        }
-    }
-
-    return outputFile;
-}
-
-string FileManage::SignAndEncryptMultiple(string pwd, string filePath, string userID, string pathStringFile, string keyringDir)
-{
-    keyringDir = conbineStrings(keyringDir, "key-store");
-
-    string newFile = ToString(userID) + "Encrypted.gpg"; //生成文件名为 userID + Encrypted.gpg
-    string outputFile = conbineStrings(pathStringFile, newFile);
-
-    char passphrase[LINE_LEN];
-    char privateKey[LINE_LEN];
-    char recipientKey[LINE_LEN];
-    char signerKey[LINE_LEN];
-
-    printf("\nPrivate Key User Id (Used to sign outgoing messages and decrypt incoming messages): ");
-    fgets(privateKey, LINE_LEN, stdin);
-    privateKey[strlen(privateKey) - 1] = '\0';
-    printf("Passphrase: ");
-    fgets(passphrase, LINE_LEN, stdin);
-    passphrase[strlen(passphrase) - 1] = '\0';
-    printf("Recipient Key User Id (Used to encrypt outgoing messages): ");
-    fgets(recipientKey, LINE_LEN, stdin);
-    recipientKey[strlen(recipientKey) - 1] = '\0';
-    printf("Signer Key User Id (Used to verify the signature of an incoming message): ");
-    fgets(signerKey, LINE_LEN, stdin);
-    signerKey[strlen(signerKey) - 1] = '\0';
-
-    modeUserIDPwd.modeUserID = privateKey;
-    modeUserIDPwd.modePwd = passphrase;
-
-    OpenPGP pgp;
-    pgp.SetInputFile(filePath.c_str());
-    pgp.SetOutputFile(outputFile.c_str());
-
-    pgp.SetASCIIArmor(true);
-    pgp.SetOverwrite(true);//覆盖写
-    pgp.SetKeyCount(1);
-    pgp.SetKeyKeyring(0, keyringDir.c_str());
-    pgp.SetKeyUserId(0, privateKey);
-    pgp.SetKeyPassphrase(0, passphrase);
-    pgp.SetRecipientKeyCount(1);
-    pgp.SetRecipientKeyKeyring(0, keyringDir.c_str());
-    pgp.SetRecipientKeyUserId(0, recipientKey);
-
-    int ret_code = pgp.SignAndEncrypt();
-    cout << ret_code << endl;
-    if (ret_code)     // Got an error.  The user is done.
-    {
-        printf("\nError: %d", ret_code);
-        if (pgp.GetLastError())
-        {
-            printf(" \"%s\"\n", pgp.GetLastError());
-        }
-    }
-
-    return outputFile;
-}
-
-bool FileManage::VerifySingle(string pwd, string filePath, string userID, string pathStringFile, string keyringDir)
-{
-    keyringDir = conbineStrings(keyringDir, "key-store");
-
-    string tempFile = conbineStrings(pathStringFile, "temp.txt");
-
-    OpenPGP pgp;
-    pgp.SetOverwrite(1);
-    pgp.SetInputFile(filePath.c_str());
-    pgp.SetOutputFile(tempFile.c_str());
-
-    pgp.SetKeyCount(1);
-    pgp.SetKeyKeyring(0, keyringDir.c_str());
-    pgp.SetKeyUserId(0, userID.c_str());
-    pgp.SetKeyPassphrase(0, pwd.c_str());
-    pgp.SetSignerKeyCount(1);
-    pgp.SetSignerKeyKeyring(0, keyringDir.c_str());
-    pgp.SetSignerKeyUserId(0, userID.c_str());
-    int ret_code = pgp.DecryptAndVerifySignature();
-    //deletetempfile
-    if (ret_code)
-    {
-        return false;
-    }
-    else
-    {
-        WriteLine("身份验证成功。");
-        WriteLine("解密结果在：");
-        WriteLine(tempFile);
-        return true;
-    }
-}
-
-bool FileManage::Verify(string pwd, string filePath, string userID, string pathStringFile, string keyringDir)
-{
-    keyringDir = conbineStrings(keyringDir, "key-store");
-
-    string tempFile = conbineStrings(pathStringFile, "temp.txt");
-
-    char passphrase[LINE_LEN];
-    char privateKey[LINE_LEN];
-    char recipientKey[LINE_LEN];
-    char signerKey[LINE_LEN];
-
-    printf("\nPrivate Key User Id (Used to sign outgoing messages and decrypt incoming messages): ");
-    fgets(privateKey, LINE_LEN, stdin);
-    privateKey[strlen(privateKey) - 1] = '\0';
-    printf("Passphrase: ");
-    fgets(passphrase, LINE_LEN, stdin);
-    passphrase[strlen(passphrase) - 1] = '\0';
-    printf("Recipient Key User Id (Used to encrypt outgoing messages): ");
-    fgets(recipientKey, LINE_LEN, stdin);
-    recipientKey[strlen(recipientKey) - 1] = '\0';
-    printf("Signer Key User Id (Used to verify the signature of an incoming message): ");
-    fgets(signerKey, LINE_LEN, stdin);
-    signerKey[strlen(signerKey) - 1] = '\0';
-
-    OpenPGP pgp;
-    pgp.SetOverwrite(1);
-    pgp.SetInputFile(filePath.c_str());
-    pgp.SetOutputFile(tempFile.c_str());
-
-    pgp.SetKeyCount(1);
-    pgp.SetKeyKeyring(0, keyringDir.c_str());
-    pgp.SetKeyUserId(0, privateKey);
-    pgp.SetKeyPassphrase(0, passphrase);
-    pgp.SetSignerKeyCount(1);
-    pgp.SetSignerKeyKeyring(0, keyringDir.c_str());
-    pgp.SetSignerKeyUserId(0, signerKey);
-    int ret_code = pgp.DecryptAndVerifySignature();
-    //deletetempfile
-    if (ret_code)
-    {
-        return false;
-    }
-    else
-    {
-        WriteLine("身份验证成功");
-        WriteLine("解密结果在：");
-        WriteLine(tempFile);
-        return true;
+        //if (pgp.GetLastError())
+        //{
+        //    printf(" \"%s\"\n", pgp.GetLastError());
+        //}
     }
 
 }
