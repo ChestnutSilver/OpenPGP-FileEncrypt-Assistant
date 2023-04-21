@@ -195,7 +195,7 @@ ps:其中username会据情况变化。
 
 主要由user、gloabl、FileManage、KeyManage、ModeManage五个类组成，还包括库中含有的KeyMgr、OpenPGP等。
 
-![image](.\pics\1-3.png) 
+![image](https://github.com/ChestnutSilver/OpenPGP-FileEncrypt-Assistant/tree/main/pics/1-3.png) 
 
 ###  1.4 概要与详细设计
 
@@ -272,7 +272,7 @@ void SignAndEncryptString(string pwd, string userID, string keyringDir);
 	    bool Verify(string pwd, string filePath, string userID, string pathStringFile, string keyringDir); //返回身份认证是否通过
 ```
 
-![image](.\pics\1-4.png)
+![image](https://github.com/ChestnutSilver/OpenPGP-FileEncrypt-Assistant/tree/main/pics/1-4.png)
 
 ### 1.5 数据字典
 
@@ -451,11 +451,11 @@ int ret_code = 0;
 
 欢迎界面设计：
 
-![image](.\pics\4-1-1.png)
+![image](https://github.com/ChestnutSilver/OpenPGP-FileEncrypt-Assistant/tree/main/pics/4-1-1.png)
 
 主界面设计：
 
-![image](.\pics\4-1-2.png)
+![image](https://github.com/ChestnutSilver/OpenPGP-FileEncrypt-Assistant/tree/main/pics/4-1-2.png)
 
 ### 4.2 模式一、原理展示
 
@@ -467,7 +467,7 @@ int ret_code = 0;
 
 **（注：中间模式选择左边的小方块，展示了每一次运行，都会生成一个ID和密码对，可以使用此ID和密码进行检验。）**
 
-![image](.\pics\4-2.png)
+![image](https://github.com/ChestnutSilver/OpenPGP-FileEncrypt-Assistant/tree/main/pics/4-2.png)
 
 ### 4.3 模式二、单用户存储调阅
 
@@ -475,7 +475,7 @@ int ret_code = 0;
 
 用户A输入自己的ID、密码和签名、授权信息以后，自己能够加密存储文件，并且进行真实性认证、调阅并解密自己的文件。
 
-![image](.\pics\4-3.png)
+![image](https://github.com/ChestnutSilver/OpenPGP-FileEncrypt-Assistant/tree/main/pics/4-3.png)
 
 ### 4.4 模式三、多用户存储调阅
 
@@ -483,17 +483,17 @@ int ret_code = 0;
 
 用户A能够授权给用户B，使用户B获取调阅权限，能够进行真实性认证和解密操作。
 
-![image](.\pics\4-4.png)
+![image](https://github.com/ChestnutSilver/OpenPGP-FileEncrypt-Assistant/tree/main/pics/4-4.png)
 
 ### 4.5 模式四、多用户调阅
 
 有调阅权限用户能够调阅相应的文件。
 
-![image](.\pics\4-5.png)
+![image](https://github.com/ChestnutSilver/OpenPGP-FileEncrypt-Assistant/tree/main/pics/4-5.png)
 
 ### 4.6 文件的生成展示
 
-![image](.\pics\4-6.png)
+![image](https://github.com/ChestnutSilver/OpenPGP-FileEncrypt-Assistant/tree/main/pics/4-6.png)
 
 ### 4.7 敏感信息的覆盖核心代码
 
