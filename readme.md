@@ -430,6 +430,8 @@ int ret_code = 0;
   - mainwindow.ui
 - Resources
   - covers.qrc
+  - cover.png
+  - mainbkg2.png
 
 ## 3. 可执行安装包
 
