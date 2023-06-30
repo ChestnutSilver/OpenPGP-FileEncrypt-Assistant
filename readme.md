@@ -2,11 +2,27 @@
 
 [TOC]
 
-**当前版本：**released 3.0。
+**简介：**
 
-**更新日期：**2023.04.21。
+同济大学 2020级 信息安全原理 课程作业（Project 3）。
 
-**开源条款：**MIT LECENSE。
+总评为“优”。
+
+**引用：**
+
+如您在作业中使用了我们的代码或报告的任何部分，请在参考文献中列出。
+
+引文格式（yyyy.mm.dd是您访问本网站的日期）：
+
+> [1] ChestnutSilver. 同济大学信息安全原理课程作业[EB/OL]. 2023[yyyy.mm.dd]. https://github.com/ChestnutSilver/OpenPGP-FileEncrypt-Assistant
+
+**当前版本：**
+
+released 3.0
+
+**更新日期：**
+
+2023.04.21
 
 **勘误更正：**
 
